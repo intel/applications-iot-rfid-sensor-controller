@@ -1,0 +1,52 @@
+{
+    "id": "Example_FIlter_Single_Port_TID",
+    "preset": {
+        "eventConfig": {
+            "common": {
+                "hostname": "enabled"
+            },
+            "tagInventory": {
+                "tagReporting": {
+                    "reportingIntervalSeconds": 0,
+                    "tagCacheSize": 2048,
+                    "antennaIdentifier": "antennaPort",
+                    "tagIdentifier": "epc"
+                },
+                "epc": "disabled",
+                "epcHex": "enabled",
+                "tid": "disabled",
+                "tidHex": "enabled",
+                "antennaPort": "enabled",
+                "transmitPowerCdbm": "enabled",
+                "peakRssiCdbm": "enabled",
+                "frequency": "enabled",
+                "pc": "disabled",
+                "lastSeenTime": "enabled",
+                "phaseAngle": "enabled"
+            }
+        },
+        "antennaConfigs": [
+            {
+                "antennaPort": 1,
+                "transmitPowerCdbm": 2700,
+                "rfMode": 100,
+                "inventorySession": 1,
+                "inventorySearchMode": "single-target",
+                "estimatedTagPopulation": 1024,
+                "filtering": {
+                    "filters": [
+                        {
+                            "action": "include",
+                            "tagMemoryBank": "tid",
+                            "bitOffset": 0,
+                            "mask": "E2801100",
+                            "maskLength": 32
+                        }
+                    ],
+                    "filterLink": "union"
+                },
+                "fastId": "enabled"
+            }
+        ]
+    }
+}

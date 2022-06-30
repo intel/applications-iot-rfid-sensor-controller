@@ -1,0 +1,23 @@
+version: '2.4'
+#
+# Copyright (C) 2022 Intel Corporation
+# SPDX-License-Identifier: BSD-3-Clause
+#
+services:
+
+  controller:
+    volumes:
+      - rfid-certs:/etc/ssl
+    environment:
+      CERT_FILE: /etc/ssl/controller.rfid.com.crt
+      KEY_FILE: /etc/ssl/controller.rfid.com.key
+
+  web-ui:
+    volumes:
+      - rfid-certs:/etc/ssl
+      - ./web-ui/nginx/nginx-https.conf:/etc/nginx/nginx.conf
+
+volumes:
+  rfid-certs: 
+    external: true
+

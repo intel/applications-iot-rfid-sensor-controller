@@ -1,0 +1,95 @@
+version: '2.4'
+#
+# Copyright (C) 2022 Intel Corporation
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# for production, have a volume for the web gui that
+# the web-ui will compile into, then set up the controller
+# server to serve the static content?
+# but the controller API will still need to be secured
+# for M2M calls from other use cases so does it matter that
+# much?
+#
+# What certs are needed?
+# use a different axios instance on controller to talk to
+# sensors without checking certs vs the API calls?
+
+services:
+  postgres-db:
+    image: postgres:9.6
+    container_name: sensor-controller_postgres-db
+    network_mode: host
+    #ports:
+    #  - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U postgres -h 127.0.0.1
+      interval: 5s
+
+  mqtt-broker:
+    image: eclipse-mosquitto:1.6.15
+    container_name: sensor-controller_mqtt-broker
+    network_mode: host
+    #ports:
+    #  - "1883:1883"
+    #  - "9883:9883"
+
+  controller:
+    build:
+      context: ./controller/
+    image: sensor-controller/controller
+    container_name: sensor-controller_controller
+    volumes:
+      - controller-auth:/controller/run/auth
+      - controller-config:/controller/run/config
+      - controller-firmware:/controller/run/firmware
+      # docker volume logging
+      - controller-log:/controller/run/log
+      # host logging - BE SURE DIRECTORY EXISTS
+      #- ./controller/run/log:/controller/run/log
+    depends_on:
+      postgres-db:
+        condition: service_healthy
+      mqtt-broker:
+        condition: service_started
+    network_mode: host
+    #ports:
+    #  - "3000:3000"
+    environment:
+      DIR_AUTH: /controller/run/auth
+      DIR_CONFIG: /controller/run/config
+      DIR_FIRMWARE: /controller/run/firmware
+      MQTT_DOWNSTREAM_HOST: ${MQTT_DOWNSTREAM_HOST:-localhost}
+      MQTT_UPSTREAM_HOST: ${MQTT_UPSTREAM_HOST:-localhost}
+      POSTGRES_HOST: ${POSTGRES_HOST:-localhost}
+      #MQTT_DOWNSTREAM_HOST: ${MQTT_DOWNSTREAM_HOST:-mqtt-broker}
+      #MQTT_UPSTREAM_HOST: ${MQTT_UPSTREAM_HOST:-mqtt-broker}
+      #POSTGRES_HOST: ${POSTGRES_HOST:-postgres-db}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      NODE_TLS_REJECT_UNAUTHORIZED: ${NODE_TLS_REJECT_UNAUTHORIZED}
+      IMPINJ_BASIC_AUTH: ${IMPINJ_BASIC_AUTH}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      LOG_FILE: ${LOG_FILE:-/controller/run/log/rfid-controller.log}
+
+  web-ui:
+    build:
+      context: ./web-ui/
+    image: sensor-controller/web-ui
+    container_name: sensor-controller_web-ui
+    network_mode: host
+    #ports:
+    #  - "80:80"
+
+volumes:
+  db-data: {}
+  controller-auth: {}
+  controller-config: {}
+  controller-firmware: {}
+  controller-log: {}

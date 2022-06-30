@@ -1,0 +1,40 @@
+{
+    "id": "FastScan_Single_Port",
+    "preset": {
+        "eventConfig": {
+            "common": {
+                "hostname": "enabled"
+            },
+            "tagInventory": {
+                "tagReporting": {
+                    "reportingIntervalSeconds": 0,
+                    "tagCacheSize": 2048,
+                    "antennaIdentifier": "antennaPort",
+                    "tagIdentifier": "epc"
+                },
+                "epc": "disabled",
+                "epcHex": "enabled",
+                "tid": "disabled",
+                "tidHex": "enabled",
+                "antennaPort": "enabled",
+                "transmitPowerCdbm": "enabled",
+                "peakRssiCdbm": "enabled",
+                "frequency": "enabled",
+                "pc": "disabled",
+                "lastSeenTime": "enabled",
+                "phaseAngle": "enabled"
+            }
+        },
+        "antennaConfigs": [
+            {
+                "antennaPort": 1,
+                "transmitPowerCdbm": 1500,
+                "rfMode": 1111,
+                "inventorySession": 0,
+                "inventorySearchMode": "single-target",
+                "estimatedTagPopulation": 1024,
+                "fastId": "enabled"
+            }
+        ]
+    }
+}

@@ -1,0 +1,51 @@
+<!--
+  ~ INTEL CONFIDENTIAL
+  ~
+  ~ Copyright (c) 2022 Intel Corporation
+  ~
+  ~ This software and the related documents are Intel copyrighted materials,
+  ~ and your use of them is governed by the express license under which they
+  ~ were provided to you ("License"). Unless the License provides otherwise,
+  ~ you may not use, modify, copy, publish, distribute, disclose or transmit
+  ~ this software or the related documents without Intel's prior written permission.
+  ~
+  ~ This software and the related documents are provided as is, with no express or
+  ~  implied warranties, other than those that are expressly stated in the License.
+  -->
+
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+
+    <!-- Frame Killer -->
+    <style>
+      /* Hide page by default */
+      html { display : none; }
+    </style>
+
+    <script>
+    if (self === top) {
+      // Everything checks out, show the page.
+      document.documentElement.style.display = 'block';
+    } else {
+      // Break out of the frame.
+      top.location = self.location;
+    }
+    </script>
+
+  </head>
+  <body>
+    <noscript>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>

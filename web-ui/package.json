@@ -1,0 +1,59 @@
+{
+  "keywords": [
+    "rfid",
+    "Impinj",
+    "Intel"
+  ],
+  "name": "rfid-web-ui",
+  "description": "User interface to the rfid-controller for configuring and managing a fleet of rfid sensors.",
+  "author": "Timothy Shockley, John Belstner",
+  "license": "MIT",
+  "version": "0.1.0",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "test": "jest --detectOpenHandles",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "axios": "^0.27.2",
+    "core-js": "^3.23.3",
+    "lodash": "^4.17.21",
+    "vue": "^3.2.37",
+    "vue-router": "^4.0.16",
+    "vuex": "^4.0.2",
+    "winston": "^3.8.0"
+  },
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.18.2",
+    "@testing-library/vue": "^6.6.0",
+    "@vue/cli-plugin-babel": "~5.0.6",
+    "@vue/cli-plugin-eslint": "~5.0.6",
+    "@vue/cli-service": "~5.0.6",
+    "@vue/compiler-sfc": "^3.2.37",
+    "eslint": "^8.18.0",
+    "eslint-plugin-vue": "^9.1.1",
+    "jest": "^28.1.1",
+    "supertest": "^6.2.3"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "browser": true,
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/vue3-essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "@babel/eslint-parser"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

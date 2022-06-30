@@ -1,0 +1,1164 @@
+swagger: '2.0'
+info:
+  description: >-
+    The RFID Sensor Controller is an Open Source software reference design
+    provided by Intel to facilitate the use and scale deployment of RFID for
+    inventory management in various use-cases such as Retail, Industrial,
+    Medical and Agriculture.  While running on an Intel Edge Compute device,
+    this application will discover and mangage all the RFID readers deployed at
+    a facility and will aggregate the RFID tag reads from each reader and
+    generate ARRIVAL, DEPARTED and MOVED events for each tag during its
+    lifecycle at a facility.
+
+
+    This software is not intended to be a complete end-to-end inventory
+    management solution.  It provides critcal tag event data intended to be
+    consumed by an Inventory Management System while abstracting the management
+    of multiple hardware devices via the API defined below.
+  version: '01'
+  title: RFID Sensor Controller
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: john.belstner@intel.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+basePath: /api/v01
+
+tags:
+  - name: auth
+    description: Login authentication
+  - name: behaviors
+    description: RF parameter macro management
+  - name: events
+    description: Configuration of upstream tag event data
+  - name: firmware
+    description: Sensor firmware update control
+  - name: mqtt
+    description: MQTT broker configuration
+  - name: sensors
+    description: Sensor configuration and management
+  - name: tags
+    description: Tag database manipulations
+
+schemes:
+  - http
+  - https
+
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
+
+paths:
+
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: Returns Bearer Token required for the secure API endpoints
+      description: ''
+      operationId: login
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: ''
+          description: ''
+          required: true
+          schema:
+            $ref: '#/definitions/AuthReq'
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              password:
+                type: string
+                description: password for the controller system
+        '400':
+          description: missing password
+        '401':
+          description: invalid password
+        '500':
+          description: token generation failed
+
+  /behaviors:
+    get:
+      tags:
+        - behaviors
+      schemes:
+        - https
+      security:
+        - Bearer: [ ]
+      summary: Returns a list of the available behaviors from the database
+      description: ''
+      operationId: getAllBehaviors
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Behavior'
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+
+  /behaviors/{behaviorId}:
+    get:
+      tags:
+        - behaviors
+      security:
+        - Bearer: [ ]
+      summary: Returns a single behavior from the database
+      description: ''
+      operationId: getOneBehavior
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: behaviorId
+          description: id string of the behavior
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation returns the behavior that was posted
+          schema:
+            $ref: '#/definitions/Behavior'
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+    post:
+      tags:
+        - behaviors
+      security:
+        - Bearer: [ ]
+      summary: Add/Update a single behavior to the database
+      description: ''
+      operationId: addOneBehavior
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: behaviorId
+          in: path
+          description: id string of the behavior
+          required: true
+          type: string
+        - in: body
+          name: ''
+          description: See Impinj [presetObject](https://platform.impinj.com/site/docs/reader_api/index.gsp) for definition
+          required: true
+          schema:
+            $ref: '#/definitions/Behavior'
+      responses:
+        '202':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/Behavior'
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+    delete:
+      tags:
+        - behaviors
+      security:
+        - Bearer: [ ]
+      summary: Deletes a behavior from the database
+      description: ''
+      operationId: deleteOneBehavior
+      produces:
+        - application/json
+      parameters:
+        - name: behaviorId
+          in: path
+          description: id string of the behavior
+          required: true
+          type: string
+      responses:
+        '202':
+          description: the behavior that was deleted
+          schema:
+            $ref: '#/definitions/Behavior'
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+
+  /events:
+    get:
+      tags:
+        - events
+      security:
+        - Bearer: [ ]
+      summary: Returns the current upstream event configuration
+      description: ''
+      operationId: getEventConfig
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/EventConfig'
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+    post:
+      tags:
+        - events
+      security:
+        - Bearer: [ ]
+      summary: Stores the upstream event configuration
+      description: ''
+      operationId: storeConfig
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: ''
+          required: true
+          schema:
+            $ref: '#/definitions/EventConfig'
+      responses:
+        '200':
+          description: successful operation returns the event configuration as persisted
+          schema:
+            $ref: '#/definitions/EventConfig'
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+
+  /firmware/images:
+    get:
+      tags:
+        - firmware
+      security:
+        - Bearer: [ ]
+      summary: Returns a list of the available firmware images
+      description: ''
+      operationId: getAllFirmware
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: array
+            description: list of filenames
+            items:
+              type: string
+              default: r700_octane_production-7.5.0.240.upgx
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+    post:
+      tags:
+        - firmware
+      security:
+        - Bearer: [ ]
+      summary: uploads a sensor firmware image file
+      description: ''
+      operationId: uploadFirmwareFile
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - name: upgradeFile
+          in: formData
+          description: firmware file to upload
+          required: true
+          type: file
+      responses:
+        '202':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              fileName:
+                type: string
+                description: name of the file that was uploaded successfully
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+    delete:
+      tags:
+        - firmware
+      security:
+        - Bearer: [ ]
+      summary: Deletes a sensor firmware image file
+      description: ''
+      operationId: deleteFirmwareFile
+      parameters:
+        - name: filename
+          in: body
+          description: name of the firmware file to delete
+          schema:
+            type: object
+            properties:
+              fileName:
+                type: string
+                description: name of the file to delete
+                default: "r700_octane_production-7.5.0.240.upgx"
+      responses:
+        '202':
+          description: successful operation
+          schema:
+            type: string
+            default: "Accepted"
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+
+  /firmware/sensors/info:
+    get:
+      tags:
+        - firmware
+      security:
+        - Bearer: [ ]
+      summary: Returns the SystemImage information from each connected sensor
+      description: See Impinj [SystemImage](https://platform.impinj.com/site/docs/reader_api/index.gsp) for definition
+      operationId: getAllFirmwareInfo
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: array
+            items:
+              type: object
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+
+  /firmware/sensors/upgrade:
+    post:
+      tags:
+        - firmware
+      security:
+        - Bearer: [ ]
+      summary: initiates a firmware update to the specified list of sensors
+      description: ''
+      operationId: updateFirmware
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: ''
+          required: true
+          schema:
+            $ref: '#/definitions/FirmwareUpdate'
+      responses:
+        '202':
+          description: successful operation
+          schema:
+            type: string
+            default: "Accepted"
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+    get:
+      tags:
+        - firmware
+      security:
+        - Bearer: [ ]
+      summary: Returns the UpgradeStatus information from each connected sensor
+      description: See Impinj [UpgradeStatus](https://platform.impinj.com/site/docs/reader_api/index.gsp) for definition
+      operationId: getAllUpgradeStatus
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: array
+            items:
+              type: object
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+
+  /mqtt:
+    get:
+      tags:
+        - mqtt
+      security:
+        - Bearer: [ ]
+      summary: Returns the MQTT configuration
+      description: ''
+      operationId: getMqttConfig
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/MqttConfig'
+        '500':
+          description: internal error
+    post:
+      tags:
+        - mqtt
+      security:
+        - Bearer: [ ]
+      summary: Stores the MQTT configuration
+      description: ''
+      operationId: storeMqttConfig
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: ''
+          required: true
+          schema:
+            $ref: '#/definitions/MqttConfig'
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/MqttConfig'
+        '400':
+          description: bad request
+    delete:
+      tags:
+        - mqtt
+      security:
+        - Bearer: [ ]
+      summary: Deletes the MQTT configuration
+      description: ''
+      operationId: deleteMqttConfig
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/MqttConfig'
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+
+  /sensors:
+    get:
+      tags:
+        - sensors
+      security:
+        - Bearer: [ ]
+      summary: Returns all sensors from the database
+      description: ''
+      operationId: getAllSensors
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Sensor'
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+    post:
+      tags:
+        - sensors
+      summary: Add/Update sensors to the database
+      description: ''
+      operationId: addAllSensors
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: ''
+          description: ''
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Sensor'
+      responses:
+        '201':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/SensorUpsertBulkResponse'
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+    delete:
+      tags:
+        - sensors
+      summary: Bulk delete sensors from the database
+      description: ''
+      operationId: deleteAllSensors
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: ''
+          description: 'Leave blank to delete all sensors from the database or include an array of deviceIds to delete'
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              default: impinj-12-34-56
+      responses:
+        '201':
+          description: successful operation
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+
+  /sensors/runstate:
+    get:
+      tags:
+        - sensors
+      security:
+        - Bearer: [ ]
+      summary: Returns the current RunState of the sensors
+      description: ''
+      operationId: getRunState
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/RunState'
+        '400':
+          description: bad request
+    put:
+      tags:
+        - sensors
+      security:
+        - Bearer: [ ]
+      summary: Set the current RunState of the sensors
+      description: ''
+      operationId: setRunState
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: ''
+          required: true
+          schema:
+            $ref: '#/definitions/RunState'
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/RunState'
+        '500':
+          description: internal error
+
+  /sensors/reboot:
+    put:
+      tags:
+        - sensors
+      security:
+        - Bearer: [ ]
+      summary: Reboots all sensors currently connected to the controller
+      description: ''
+      operationId: rebootAll
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: array
+            description: list of sensor device ids
+            items:
+              $ref: '#/definitions/SensorRebootStatus'
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+
+  /sensors/{deviceId}:
+    get:
+      tags:
+        - sensors
+      summary: Returns a single sensor from the database
+      description: ''
+      operationId: getSensorById
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: deviceId
+          description: hostname of the sensor
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/Sensor'
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+    post:
+      tags:
+        - sensors
+      summary: Add/Update a single sensor to the database
+      description: ''
+      operationId: addOneSensor
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: deviceId
+          in: path
+          description: hostname of the sensor
+          required: true
+          type: string
+        - in: body
+          name: ''
+          description: ''
+          required: true
+          schema:
+            $ref: '#/definitions/Sensor'
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/Sensor'
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+    delete:
+      tags:
+        - sensors
+      summary: Deletes a sensor from the database
+      description: ''
+      operationId: deleteOneSensor
+      produces:
+        - application/json
+      parameters:
+        - name: deviceId
+          in: path
+          description: hostname of the sensor
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+
+  /sensors/{deviceId}/reboot:
+    put:
+      tags:
+        - sensors
+      security:
+        - Bearer: [ ]
+      summary: Reboots a single sensor currently connected to the controller
+      description: ''
+      operationId: rebootOne
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: deviceId
+          description: hostname of the sensor
+          required: true
+          type: string
+      responses:
+        '202':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/SensorRebootStatus'
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+
+  /tags:
+    get:
+      tags:
+        - tags
+      summary: Returns all tags from the database
+      description: ''
+      operationId: getAllTags
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/TagResponse'
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+    post:
+      tags:
+        - tags
+      summary: Preload a list of tags into the database
+      description: ''
+      operationId: setAllTags
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: ''
+          description: ''
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Tag'
+      responses:
+        '201':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/TagCreateResponse'
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+    delete:
+      tags:
+        - tags
+      summary: Bulk delete tags from the database
+      description: ''
+      operationId: deleteAllTags
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: ''
+          description: 'Leave blank to delete all tags from the database or include an array of EPCs to delete'
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              default: 30143639F8419145BEEF065E
+      responses:
+        '201':
+          description: successful operation
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+
+  /tags/{epc}:
+    get:
+      tags:
+        - tags
+      summary: Returns a single tag from the database
+      description: ''
+      operationId: getTagByEpc
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: epc
+          description: tag epc in hex
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/Tag'
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+    delete:
+      tags:
+        - tags
+      summary: Deletes a sensor from the database
+      description: ''
+      operationId: deleteOneTag
+      produces:
+        - application/json
+      parameters:
+        - name: epc
+          in: path
+          description: epc in hex
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+
+  /tags/{epc}/sensors:
+    get:
+      tags:
+        - tags
+      summary: Returns the location history of a single tag from the database
+      description: ''
+      operationId: getTagHistory
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: epc
+          description: tag epc in hex
+          required: true
+          type: string
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TagStats'
+        '400':
+          description: bad request
+        '500':
+          description: internal error
+
+definitions:
+
+  AntennaPort:
+    type: object
+    properties:
+      antennaPort:
+        type: integer
+        enum:
+          - 1
+          - 2
+          - 3
+          - 4
+      antennaName:
+        type: string
+        default: Stockroom
+      facilityId:
+        type: string
+        default: Store-123
+      personality:
+        type: string
+        description: special tag read functionality
+        enum:
+          - none
+          - exit
+          - pos
+
+  Behavior:
+    type: object
+    properties:
+      id:
+        type: string
+        default: Fast_Scan_Single_Port
+      preset:
+        type: object
+        description: Impinj presetObject defined [here](https://platform.impinj.com/site/docs/reader_api/index.gsp)
+
+  TagCreateResponse:
+    type: object
+    properties:
+      created:
+        type: array
+        items:
+          type: string
+          description: epc of successfully created tags
+      failed:
+        type: array
+        items:
+          type: string
+          description: error messages for failed tags
+
+  EventConfig:
+    type: object
+    properties:
+      exitTimeout:
+        type: integer
+        description: Time in milliseconds before a tag is declared DEPARTED after last read from an EXIT antenna
+        default: 30000
+      posReturnHoldoff:
+        type: integer
+        description: Time in milliseconds before a tag can ARRIVE after being declared DEPARTED_POS
+        default: 8640000
+      mobilityProfile:
+        type: object
+        properties:
+          holdoff:
+            type: integer
+            description: how long to wait in milliseconds before applying the RSSI adjustment
+            default: 0
+          slope:
+            type: number
+            description: slope of the time weighted curve in units of hundredths of a dBm per millisecond
+            default: -0.8
+          threshold:
+            type: integer
+            description: average RSSI delta before changing location in hundredths of a dBm
+            default: 600
+
+  FirmwareUpdate:
+    type: object
+    properties:
+      filename:
+        type: string
+        description: firmware filename to use for update
+        default: r700_octane_production-7.5.0.240.upgx
+      deviceIds:
+        type: array
+        description: list of sensor hostnames
+        items:
+          type: string
+          default: impinj-12-34-56
+
+  Location:
+    type: object
+    properties:
+      deviceId:
+        type: string
+        default: impinj-12-34-56
+      antennaPort:
+        type: integer
+        enum:
+          - 1
+          - 2
+          - 3
+          - 4
+      antennaName:
+        type: string
+        default: Stockroom
+
+  MqttConfig:
+    type: object
+    properties:
+      useDefault:
+        type: boolean
+        description: use the default configuration
+        default: true
+      downstream:
+        $ref: '#/definitions/MqttBrokerConfig'
+      upstream:
+        $ref: '#/definitions/MqttBrokerConfig'
+
+  MqttBrokerConfig:
+    type: object
+    description: MQTT broker configuration
+    properties:
+      host:
+        type: string
+        description: broker hostname or url
+        default: localhost
+      port:
+        type: integer
+        description: broker port
+        default: 1883
+      username:
+        type: string
+        description: broker basic auth username
+        default: ""
+      password:
+        type: string
+        description: broker basic auth password
+        default: ""
+
+  AuthReq:
+    type: object
+    properties:
+      password:
+        type: string
+        description: Password used for controller API, min 8 characters long
+
+  RunState:
+    type: object
+    properties:
+      runstate:
+        type: string
+        enum:
+          - inactive
+          - active
+        default: active
+
+  Sensor:
+    type: object
+    properties:
+      deviceId:
+        type: string
+        description: hostname
+        default: impinj-12-34-56
+      ip4Address:
+        type: string
+        default: 192.168.1.34
+      behaviorId:
+        type: string
+        description: behavior currently assigned
+        default: Fast_Scan_Single_Port
+      status:
+        type: string
+        description: read status
+        enum:
+          - unknown
+          - idle
+          - running
+        default: idle
+      connected:
+        type: boolean
+        description: in comms with controller
+      antennaPorts:
+        type: array
+        items:
+          $ref: '#/definitions/AntennaPort'
+
+  Tag:
+    type: object
+    properties:
+      epc:
+        type: string
+        description: tag EPC in hex
+        default: 30143639F8419145BEEF065E
+      tid:
+        type: string
+        description: tag TID in hex
+        default: E28011002000589AE0EC0888
+      state:
+        type: string
+        description: tag state
+        enum:
+          - present
+          - exiting
+          - departed_exit
+          - departed_pos
+        default: present
+      location:
+        $ref: '#/definitions/Location'
+      facilityId:
+        type: string
+        default: Store-123
+      lastRead:
+        type: string
+        format: date-time
+      lastArrived:
+        type: string
+        format: date-time
+      lastMoved:
+        type: string
+        format: date-time
+      lastDeparted:
+        type: string
+        format: date-time
+
+  TagStats:
+    type: object
+    properties:
+      epc:
+        type: string
+        description: tag EPC in hex
+        default: 30143639F8419145BEEF065E
+      deviceId:
+        type: string
+        description: device hostname
+        default: impinj-12-34-56
+      antennaPort:
+        type: integer
+        enum:
+          - 1
+          - 2
+          - 3
+          - 4
+      lastRead:
+        type: string
+        format: date-time
+      meanRssi:
+        type: integer
+        description: mean RSSI in dBm * 100
+        default: -6432
+      interval:
+        type: integer
+        description: last read interval in ms
+        default: 115
+      numReads:
+        type: integer
+        description: number of reads from this location
+        default: 47
+
+  TagResponse:
+    type: array
+    description: array of tags that match the filter parameters in the query
+    items:
+      $ref: '#/definitions/Tag'
+
+  SensorUpsertBulkResponse:
+    type: object
+    properties:
+      sensors:
+        type: array
+        items:
+          $ref: '#/definitions/Sensor'
+      startMessages:
+        type: array
+        items:
+          type: string
+          description: informational message about the sensor
+      stopMessages:
+        type: array
+        items:
+          type: string
+          description: informational message about the sensor
+
+  SensorRebootStatus:
+    type: object
+    properties:
+      deviceId:
+        type: string
+        description: device id being rebooted
+        default: impinj-12-34-56
+      status:
+        type: string
+        description: status of the reboot command to the sensor
+        default: OK rebooted
+
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io

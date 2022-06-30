@@ -1,0 +1,9 @@
+{
+    "exitTimeout": 30000,
+    "posReturnHoldoff": 8640000,
+    "mobilityProfile": {
+        "holdoff": 0,
+        "slope": -0.8,
+        "threshold": 600
+    }
+}

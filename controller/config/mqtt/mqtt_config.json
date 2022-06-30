@@ -1,0 +1,22 @@
+{
+    "eventsTopic": "rfid/events",
+    "alertsTopic": "rfid/alerts",
+    "sensorConfig": {
+        "active": true,
+        "brokerHostname": "192.168.1.49",
+        "brokerPort": 1883,
+        "cleanSession": true,
+        "clientId": "device_hostname",
+        "eventBufferSize": 1024,
+        "eventPerSecondLimit": 1000,
+        "eventPendingDeliveryLimit": 100,
+        "eventQualityOfService": 0,
+        "eventTopic": "rfid/data",
+        "keepAliveIntervalSeconds": 0,
+        "username": "",
+        "password": "",
+        "willTopic": "rfid/will",
+        "willMessage": "offline",
+        "willQualityOfService": 0
+    }
+}

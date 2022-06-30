@@ -1,0 +1,43 @@
+{
+    "id": "DeepScan_Single_Port",
+    "preset": {
+        "eventConfig": {
+            "common": {
+                "hostname": "enabled"
+            },
+            "tagInventory": {
+                "tagReporting": {
+                    "reportingIntervalSeconds": 0,
+                    "tagCacheSize": 2048,
+                    "antennaIdentifier": "antennaPort",
+                    "tagIdentifier": "epc"
+                },
+                "epc": "disabled",
+                "epcHex": "enabled",
+                "tid": "disabled",
+                "tidHex": "enabled",
+                "antennaPort": "enabled",
+                "transmitPowerCdbm": "enabled",
+                "peakRssiCdbm": "enabled",
+                "frequency": "enabled",
+                "pc": "disabled",
+                "lastSeenTime": "enabled",
+                "phaseAngle": "enabled"
+            }
+        },
+        "antennaConfigs": [
+            {
+                "antennaPort": 1,
+                "transmitPowerCdbm": 2700,
+                "rfMode": 1110,
+                "inventorySession": 2,
+                "inventorySearchMode": "single-target",
+                "estimatedTagPopulation": 1024,
+                "powerSweeping": {
+                    "minimumPowerCdbm": 1500,
+                    "stepSizeCdb": 300
+                }
+            }
+        ]
+    }
+}
