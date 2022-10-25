@@ -29,7 +29,7 @@
         >
           <tr>
             <td></td>
-            <td align="right">
+            <td style="text-align: right;">
               <button
                 class="w3-tiny"
                 @click="remove(index)"

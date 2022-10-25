@@ -4,12 +4,12 @@
  */
 
 import { createRouter, createWebHistory } from "vue-router";
-import Behaviors from "@/behaviors/Behaviors";
-import SensorControl from "@/sensor/control/Sensors";
-import SensorConfig from "@/sensor/config/Sensors";
-import SensorFirmware from "@/sensor/firmware/Firmware";
-import Tags from "@/tags/Tags";
-import Events from "@/events/Events"
+import Behaviors from "@/behaviors/Behaviors.vue";
+import SensorControl from "@/sensor/control/Sensors.vue";
+import SensorConfig from "@/sensor/config/Sensors.vue";
+import SensorFirmware from "@/sensor/firmware/Firmware.vue";
+import Tags from "@/tags/Tags.vue";
+import Events from "@/events/Events.vue"
 
 const router = createRouter({
   history: createWebHistory(),
