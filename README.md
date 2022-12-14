@@ -145,14 +145,14 @@ cd ./controller
 # install node dependencies (if needed)
 npm install
 # uses npm to execute the start:dev script from package.json
-npm run start:dev
+npm run dev
 
 # web-ui
 cd ../web-ui
 # install node dependencies (if needed)
 npm install
 # uses npm to execute the serve script from package.json
-npm run serve
+npm run dev
 ```
 
 ## Clearing Data and Rebuilding Images
