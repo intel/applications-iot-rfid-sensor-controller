@@ -4,16 +4,17 @@
     "Impinj",
     "Intel"
   ],
-  "name": "rfid-controller",
+  "name": "rfid-sensor-controller",
   "description": "Used for configuring and managing a fleet of rfid sensors.",
-  "author": "Timothy Shockley, John Belstner",
-  "license": "MIT",
-  "main": "server.js",
   "version": "1.0.0",
+  "author": "Timothy Shockley, John Belstner",
+  "license": "BSD-3-Clause",
+  "main": "server.js",
   "scripts": {
-    "start:dev": "nodemon --watch src --verbose --inspect src/server",
+    "dev": "nodemon --watch src --verbose --inspect src/server",
+    "serve": "node src/server",
     "test": "jest --detectOpenHandles",
-    "lint": "eslint 'lib/**/*.{js,jsx}'"
+    "lint": "eslint ./src --ext .js,.jsx --ignore-path .gitignore"
   },
   "nodemonConfig": {
     "ignore": [
@@ -23,29 +24,29 @@
   },
   "dependencies": {
     "async-lock": "^1.3.2",
-    "async-mutex": "^0.3.2",
-    "axios": "^0.27.2",
+    "async-mutex": "^0.4.0",
+    "axios": "^1.1.3",
     "bcryptjs": "^2.4.3",
-    "body-parser": "^1.20.0",
+    "body-parser": "^1.20.1",
     "cors": "^2.8.5",
     "dnssd": "^0.4.1",
-    "express": "^4.18.1",
+    "express": "^4.18.2",
     "form-data": "^4.0.0",
     "formidable": "^2.0.1",
     "fs": "^0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "mqtt": "^4.3.7",
-    "pg": "^8.7.3",
+    "pg": "^8.8.0",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.21.2",
-    "winston": "^3.8.0"
+    "sequelize": "^6.25.3",
+    "winston": "^3.8.2"
   },
   "devDependencies": {
-    "eslint": "^8.18.0",
+    "eslint": "^8.26.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",
-    "nodemon": "^2.0.18"
+    "nodemon": "^2.0.20"
   },
   "eslintConfig": {
     "root": true,
