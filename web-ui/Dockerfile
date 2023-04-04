@@ -2,7 +2,7 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: BSD-3-Clause
 #
-FROM node:18-alpine AS base
+FROM node:19-alpine AS base
 WORKDIR /web-ui
 COPY package*.json ./
 RUN npm ci && npm cache clean --force

@@ -2,7 +2,7 @@
 # Copyright (C) 2022 Intel Corporation
 # SPDX-License-Identifier: BSD-3-Clause
 ## see https://hub.docker.com/_/node
-FROM node:18-alpine AS base
+FROM node:19-alpine AS base
 ENV NODE_ENV=production
 WORKDIR /controller
 COPY ./package*.json ./

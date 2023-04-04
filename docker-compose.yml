@@ -16,7 +16,7 @@ version: '2.4'
 
 services:
   postgres-db:
-    image: postgres:9.6
+    image: postgres:alpine
     container_name: sensor-controller_postgres-db
     network_mode: host
     #ports:
